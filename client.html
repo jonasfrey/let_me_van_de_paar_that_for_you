@@ -1,0 +1,193 @@
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<div id="app">
+</div>
+
+<style>
+    *{
+    margin:0;
+    padding:0;
+    }
+    .mouse{
+        position: absolute;
+        z-index: 2;
+        width: 20px;
+        height: 22px;
+        background: url('./mouse.png');
+        left: 20%;
+        top: 20%;
+        background-size: contain;
+        -webkit-font-smoothing: subpixel-antialiased;
+        background-repeat: no-repeat;
+    }
+    .i{
+        position: fixed;
+        z-index: 1;
+        font-family: "Roboto", "Noto", sans-serif;
+        top: 47.2%;
+        left: 71.6%;
+        padding: 0.3rem 0;
+        border: none;
+        border-bottom: 2px solid black;
+        outline: none;
+    }
+    .i:focus,.i:focus-visible, .i:active{
+        position: fixed;
+        z-index: 1;
+        font-family: "Roboto", "Noto", sans-serif;
+        top: 47.2%;
+        left: 71.6%;
+        padding: 0.3rem 0;
+        border: none;
+        border-bottom: 2px solid black;
+    }
+.bg{
+    background-image: url(./background.png);
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.lmvdptfy{
+    position: fixed;
+    z-index: 1;
+    font-family: "Roboto", "Noto", sans-serif;
+    top: 37.8%;
+    left: 37.6%;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+</style>
+
+<script type="module">
+
+
+
+    import O_json_to_html from "https://unpkg.com/o_json_to_html@1.0.6/o_json_to_html.module.js"
+
+    var o_json_to_html = new O_json_to_html()
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.getElementById("app").append(
+            o_json_to_html.f_json_to_html(
+                {
+                class: "gontainer",
+                a_c: [
+                    {
+                        "class":"mouse",
+                        ":style":"s_style_mouse"
+
+                    },
+                    {
+                        class: "bg", 
+                    },
+                    {
+                        class: "lmvdptfy", 
+                        "s_inner_text": ", let me 'Van de Paar' that for you..."
+                    },
+                    {
+                        s_t:"input",
+                        "class":"i",
+                        'v-model':"s_text"
+                    }
+                ]
+                }
+            )
+                );
+                
+                
+                window.vueObject = new Vue({
+            el: '#app',
+            data: function(){
+                return {
+                    s_text: '', 
+                    s_text_appear: decodeURIComponent(window.location.hash).slice(1), 
+                    n_ms_max_until_next_char: 333,
+                    s_url_search: "https://www.youtube.com/@RoelVandePaar/search?query=${s_query_uriencoded}",
+                    s_style_mouse: '', 
+                    b_update_text_started: false
+                }
+            },
+            updated: async function(){
+
+            },
+            mounted:async function () {
+                var o_self = this;
+                console.log(window.location.hash)
+                if(window.location.hash == ""){
+                    let s_prompt = prompt("Enter your query: ", "how many videos does van de paar have ?");
+                    // window.location.href = window.location.href + "#" + encodeURI(s_prompt)
+                    alert("your url is: "+window.location.href + "#" + encodeURI(s_prompt))
+                }else{
+                    o_self.f_update_mouse();
+                }
+            },
+            watch: {
+            },
+            methods: {
+                f_s_style_mouse: function(){
+                    var o_self = this;
+                    var n_t = window.performance.now()*0.0005;
+                    var n_norm = Math.min(n_t+0.2, 1);
+                    if(n_norm >= 1){
+                        if(!o_self.b_update_text_started){
+                            window.setTimeout(function(){
+                                o_self.f_update_s_text()
+                            },100)
+                            o_self.b_update_text_started = true;
+                        }
+                    }
+                    return `
+                    left: ${n_norm*80.4}%;
+                    top: ${n_norm*49.4}%;
+                    `.split("\n").join("")
+                },
+                f_update_mouse: function(){
+                    var o_self = this;
+                    var n_target_x = 80;
+                    var n_target_y = 80;
+                    window.setTimeout(function(){      
+                        o_self.s_style_mouse = o_self.f_s_style_mouse();
+                        o_self.f_update_mouse();
+                    },10)
+                },
+                f_update_s_text: function(){
+                    let o_self = this
+                    if(o_self.s_text.length < o_self.s_text_appear.length){
+                        window.setTimeout(function(){
+                            o_self.s_text = o_self.s_text_appear.substr(0, o_self.s_text.length+1)
+                            
+                            o_self.f_update_s_text();
+                            document.querySelector("input").scrollLeft = 1000000
+                        }, Math.random()*o_self.n_ms_max_until_next_char)                   
+                    }else{
+                        document.querySelector("input").scrollLeft = 1000000
+
+                        window.setTimeout(function(){
+                            o_self.f_search();
+                        },1000)
+                    }
+                }, 
+                f_search: function(s_query){
+                    var o_self = this;
+                    window.location.href = o_self.s_url_search.replace("${s_query_uriencoded}", encodeURI(o_self.s_text_appear));
+                }
+            },
+            computed: {
+                
+            }
+        })
+    });
+
+</script>
